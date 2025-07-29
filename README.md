@@ -22,7 +22,7 @@ This custom component has been evolved to become part of the Home Assistant core
    - Go to HACS → Integrations
    - Click the three dots in the top right corner
    - Select "Custom repositories"
-   - Add `https://github.com/mduran80/daikin_madoka` as repository
+   - Add `https://github.com/atanarro/daikin_madoka` as repository
    - Select "Integration" as category
    - Click "Add"
 3. Install the integration through HACS
@@ -93,10 +93,10 @@ Icon and integration images.
 
 ---
 
-[releases-shield]: https://img.shields.io/github/release/mduran80/daikin_madoka.svg?style=for-the-badge
-[releases]: https://github.com/mduran80/daikin_madoka/releases
-[commits-shield]: https://img.shields.io/github/commit-activity/y/mduran80/daikin_madoka.svg?style=for-the-badge
-[commits]: https://github.com/mduran80/daikin_madoka/commits/main
-[license-shield]: https://img.shields.io/github/license/mduran80/daikin_madoka.svg?style=for-the-badge
+[releases-shield]: https://img.shields.io/github/release/atanarro/daikin_madoka.svg?style=for-the-badge
+[releases]: https://github.com/atanarro/daikin_madoka/releases
+[commits-shield]: https://img.shields.io/github/commit-activity/y/atanarro/daikin_madoka.svg?style=for-the-badge
+[commits]: https://github.com/atanarro/daikin_madoka/commits/main
+[license-shield]: https://img.shields.io/github/license/atanarro/daikin_madoka.svg?style=for-the-badge
 [hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
 [hacs]: https://github.com/hacs/integration
