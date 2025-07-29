@@ -17,12 +17,12 @@ import homeassistant.helpers.config_validation as cv
 from homeassistant.core import HomeAssistant
 
 from . import config_flow  # noqa: F401
-from .const import CONTROLLERS, DOMAIN
+from .const import CONTROLLERS, DOMAIN, TIMEOUT, CONF_CONTROLLER_TIMEOUT
 
 PARALLEL_UPDATES = 0
 MIN_TIME_BETWEEN_UPDATES = timedelta(seconds=60)
 
-COMPONENT_TYPES = ["climate"]
+COMPONENT_TYPES = ["climate", "sensor"]
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -38,6 +38,7 @@ CONFIG_SCHEMA = vol.Schema(
                     vol.Optional(CONF_FORCE_UPDATE, default=True): bool,
                     vol.Optional(CONF_DEVICE, default="hci0"): cv.string,
                     vol.Optional(CONF_SCAN_INTERVAL, default=5): cv.positive_int,
+                    vol.Optional(CONF_CONTROLLER_TIMEOUT, default=TIMEOUT): cv.positive_int,
                 }
             )
         },
@@ -67,14 +68,23 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         adapter=entry.data[CONF_DEVICE], timeout=entry.data[CONF_SCAN_INTERVAL]
     )
 
+    # Get controller timeout from config, fallback to default if not set
+    controller_timeout = entry.data.get(CONF_CONTROLLER_TIMEOUT, TIMEOUT)
+
     for device, controller in controllers.items():
         try:
-            await asyncio.wait_for(controller.start(), timeout=10)
+            await asyncio.wait_for(controller.start(), timeout=controller_timeout)
         except ConnectionAbortedError as connection_aborted_error:
             _LOGGER.error(
                 "Could not connect to device %s: %s",
                 device,
                 str(connection_aborted_error),
+            )
+        except asyncio.TimeoutError:
+            _LOGGER.error(
+                "Timeout connecting to device %s after %d seconds",
+                device,
+                controller_timeout,
             )
 
     hass.data.setdefault(DOMAIN, {})

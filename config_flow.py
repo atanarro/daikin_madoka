@@ -15,7 +15,7 @@ from homeassistant.const import (
 )
 import homeassistant.helpers.config_validation as cv
 
-from .const import DOMAIN, TITLE, UNIQUE_ID
+from .const import DOMAIN, TITLE, UNIQUE_ID, TIMEOUT, CONF_CONTROLLER_TIMEOUT
 
 
 @config_entries.HANDLERS.register(DOMAIN)
@@ -39,11 +39,12 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Optional(CONF_FORCE_UPDATE, default=True): bool,
                 vol.Optional(CONF_DEVICE, default="hci0"): cv.string,
                 vol.Optional(CONF_SCAN_INTERVAL, default=5): cv.positive_int,
+                vol.Optional(CONF_CONTROLLER_TIMEOUT, default=TIMEOUT): cv.positive_int,
             }
         )
 
     async def _create_entry(
-        self, devices, scan_interval=None, force_update=None, device=None
+        self, devices, scan_interval=None, force_update=None, device=None, controller_timeout=None
     ):
         """Register new entry."""
 
@@ -55,6 +56,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                 CONF_SCAN_INTERVAL: scan_interval,
                 CONF_FORCE_UPDATE: force_update,
                 CONF_DISCOVERY: False,
+                CONF_CONTROLLER_TIMEOUT: controller_timeout,
             },
         )
 
@@ -125,6 +127,7 @@ class FlowHandler(config_entries.ConfigFlow, domain=DOMAIN):
                         user_input.get(CONF_SCAN_INTERVAL),
                         user_input.get(CONF_FORCE_UPDATE),
                         user_input.get(CONF_DEVICE),
+                        user_input.get(CONF_CONTROLLER_TIMEOUT),
                     )
         if user_input is None or len(errors) > 0:
             return self.async_show_form(

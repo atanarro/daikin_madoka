@@ -1,5 +1,10 @@
 # Home Assistant Daikin Madoka
 
+[![GitHub Release][releases-shield]][releases]
+[![GitHub Activity][commits-shield]][commits]
+[![License][license-shield]](LICENSE)
+[![hacs][hacsbadge]][hacs]
+
 This is a custom component developed to support Daikin Madoka BRC1H thermostats in Home Assistant. 
 
 This custom component has been evolved to become part of the Home Assistant core integrations and is awaiting to be integrated.
@@ -9,6 +14,21 @@ This custom component has been evolved to become part of the Home Assistant core
 ![](images/integration.png)  ![](images/climate.png) ![](images/entities.png) 
 
 ## Installation
+
+### HACS (Recommended)
+
+1. Make sure you have [HACS](https://hacs.xyz/) installed
+2. Add this repository as a custom repository in HACS:
+   - Go to HACS → Integrations
+   - Click the three dots in the top right corner
+   - Select "Custom repositories"
+   - Add `https://github.com/mduran80/daikin_madoka` as repository
+   - Select "Integration" as category
+   - Click "Add"
+3. Install the integration through HACS
+4. Restart Home Assistant
+
+### Manual Installation
 
 Download folder and copy under "custom_components" folder in the Home Assistant configuration folder.
 
@@ -70,3 +90,13 @@ Kudos to [Jose](https://community.home-assistant.io/u/jcsogo) for the solution.
 ## TODO
 This document.
 Icon and integration images.
+
+---
+
+[releases-shield]: https://img.shields.io/github/release/mduran80/daikin_madoka.svg?style=for-the-badge
+[releases]: https://github.com/mduran80/daikin_madoka/releases
+[commits-shield]: https://img.shields.io/github/commit-activity/y/mduran80/daikin_madoka.svg?style=for-the-badge
+[commits]: https://github.com/mduran80/daikin_madoka/commits/main
+[license-shield]: https://img.shields.io/github/license/mduran80/daikin_madoka.svg?style=for-the-badge
+[hacsbadge]: https://img.shields.io/badge/HACS-Custom-orange.svg?style=for-the-badge
+[hacs]: https://github.com/hacs/integration

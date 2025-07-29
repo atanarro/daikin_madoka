@@ -32,7 +32,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
 async def async_setup_entry(hass, entry, async_add_entities):
     """Set up Daikin climate based on config_entry."""
     ent = []
-    for controller in hass.data[DOMAIN][CONTROLLERS].values():
+    for controller in hass.data[DOMAIN][entry.entry_id][CONTROLLERS].values():
         ent.append(MadokaSensor(controller))
     async_add_entities(ent)
 

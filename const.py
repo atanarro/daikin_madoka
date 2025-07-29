@@ -15,3 +15,4 @@ MIN_TEMP = 16
 MAX_TEMP = 32
 
 TIMEOUT = 60
+CONF_CONTROLLER_TIMEOUT = "controller_timeout"
