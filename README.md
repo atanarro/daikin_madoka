@@ -56,6 +56,7 @@ A new integration will be available under the name "Daikin Madoka". You have to 
 - Name of the Bluetooth adapter (usually hci0)
 
 The integration will scan for the devices and will create the thermostat and the temperature sensor.
+
 ## Troubleshooting
 
 * **The integration form shows an error "The device could not be found" next to the adapter field but "hcitool dev" lists the device" **
@@ -74,7 +75,7 @@ If the following error appears, DBUS is not available to the docker instance.
 File "/usr/local/lib/python3.8/site-packages/bleak/backends/bluezdbus/scanner.py", line 90, in start
     self._bus = await client.connect(self._reactor, "system").asFuture(loop)
 twisted.internet.error.ConnectError: An error occurred while connecting: Failed to connect to any bus address. Last error: An error occurred while connecting: 2: No such file or directory..
-“Failed to connect to any bus address”
+"Failed to connect to any bus address"
 ```
 To make DBus available you have to link /var/run/dbus/system_bus_socket inside the container and also run docker in privileged mode. 
 
@@ -86,6 +87,32 @@ privileged: true
 ```
 
 Kudos to [Jose](https://community.home-assistant.io/u/jcsogo) for the solution.
+
+* **"Module pymadoka.connection is logging too frequently" warning in Home Assistant logs**
+
+If you see warnings like "Module pymadoka.connection is logging too frequently. 200 messages since last count", this indicates that the underlying pymadoka library is generating excessive connection-related log messages. This typically happens due to:
+
+- Bluetooth connectivity issues between Home Assistant and the thermostat
+- Frequent connection/disconnection cycles
+- Network interference or distance issues
+
+To reduce log verbosity, add the following to your Home Assistant `configuration.yaml`:
+
+```yaml
+logger:
+  default: info
+  logs:
+    pymadoka.connection: error
+    pymadoka: warning
+```
+
+This will suppress debug and info level messages from the pymadoka library while still showing important warnings and errors. You can also set the level to `critical` if you want to suppress all but the most critical messages.
+
+If the excessive logging persists, consider:
+1. Checking the Bluetooth connection quality between Home Assistant and the thermostat
+2. Ensuring the thermostat is within proper range of the Bluetooth adapter
+3. Verifying that no other devices are interfering with the Bluetooth connection
+4. Restarting the integration or Home Assistant if connection issues persist
 
 ## TODO
 This document.
