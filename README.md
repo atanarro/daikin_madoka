@@ -114,6 +114,85 @@ If the excessive logging persists, consider:
 3. Verifying that no other devices are interfering with the Bluetooth connection
 4. Restarting the integration or Home Assistant if connection issues persist
 
+* **BluZ "Operation already in progress" and "br-connection-canceled" errors**
+
+If you see repeated error patterns like:
+```
+[org.bluez.Error.Failed] Operation already in progress
+[org.bluez.Error.Failed] br-connection-canceled
+```
+
+This indicates a Bluetooth stack issue where connection attempts are overlapping and causing conflicts. To resolve this:
+
+1. **Restart the Bluetooth service:**
+   ```bash
+   sudo systemctl restart bluetooth
+   ```
+
+2. **Reset the Bluetooth adapter:**
+   ```bash
+   sudo hciconfig hci0 down
+   sudo hciconfig hci0 up
+   ```
+
+3. **Clear the Bluetooth cache and re-pair the device:**
+   ```bash
+   # Remove the existing pairing
+   bluetoothctl
+   remove <BRC1H_MAC_ADDRESS>
+   exit
+   
+   # Restart Home Assistant and re-add the integration
+   ```
+
+4. **If using Docker, ensure proper Bluetooth access:**
+   - Add `--privileged` flag to your Docker command
+   - Or use specific device mapping: `--device=/dev/bus/usb`
+   - Ensure DBus socket is mounted: `-v /var/run/dbus:/var/run/dbus:ro`
+
+5. **Temporary workaround - Reduce logging level:**
+   ```yaml
+   logger:
+     default: info
+     logs:
+       pymadoka.connection: critical
+   ```
+
+6. **Check for conflicting Bluetooth processes:**
+   ```bash
+   sudo lsof /dev/tty* | grep Blue
+   ps aux | grep blue
+   ```
+
+If the issue persists, try:
+- Using a dedicated Bluetooth adapter for Home Assistant
+- Increasing the controller timeout in the integration configuration
+- Restarting Home Assistant after making Bluetooth changes
+
+**Recommended logging configuration for Bluetooth issues:**
+
+Add this to your `configuration.yaml` to manage excessive Bluetooth logging:
+
+```yaml
+logger:
+  default: info
+  logs:
+    # Reduce pymadoka connection logging
+    pymadoka.connection: critical
+    pymadoka: warning
+    
+    # Reduce Home Assistant Daikin Madoka integration logging for known Bluetooth issues
+    custom_components.daikin_madoka: info
+    
+    # Optional: Reduce general Bluetooth logging
+    homeassistant.components.bluetooth: warning
+```
+
+This configuration will:
+- Set pymadoka connection logging to critical only (suppresses the repetitive BluZ errors)
+- Keep integration logging at info level for important status updates  
+- Reduce general Bluetooth component logging if needed
+
 ## TODO
 This document.
 Icon and integration images.

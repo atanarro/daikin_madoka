@@ -86,6 +86,36 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 device,
                 controller_timeout,
             )
+        except Exception as e:
+            # Handle BluZ specific errors and other connection issues
+            error_msg = str(e).lower()
+            if "operation already in progress" in error_msg:
+                _LOGGER.warning(
+                    "Bluetooth operation conflict for device %s. "
+                    "Try restarting the Bluetooth service or Home Assistant. Error: %s",
+                    device,
+                    str(e),
+                )
+            elif "br-connection-canceled" in error_msg:
+                _LOGGER.warning(
+                    "Bluetooth connection canceled for device %s. "
+                    "Device may be out of range or Bluetooth stack issue. Error: %s",
+                    device,
+                    str(e),
+                )
+            elif "dbus" in error_msg:
+                _LOGGER.error(
+                    "DBus connection issue for device %s. "
+                    "Ensure DBus is available to Home Assistant. Error: %s",
+                    device,
+                    str(e),
+                )
+            else:
+                _LOGGER.error(
+                    "Unexpected error connecting to device %s: %s",
+                    device,
+                    str(e),
+                )
 
     hass.data.setdefault(DOMAIN, {})
     hass.data[DOMAIN][entry.entry_id] = {CONTROLLERS: controllers}

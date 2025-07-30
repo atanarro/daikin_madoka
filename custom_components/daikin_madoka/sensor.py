@@ -1,4 +1,6 @@
 """Support for Daikin AC sensors."""
+import logging
+
 from homeassistant.const import (
     CONF_TYPE,
     CONF_UNIT_OF_MEASUREMENT,
@@ -19,6 +21,8 @@ from .const import (
 
 from pymadoka import Controller
 from pymadoka.feature import ConnectionException, ConnectionStatus
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_platform(hass, config, async_add_entities, discovery_info=None):
@@ -92,8 +96,38 @@ class MadokaSensor(Entity):
             await self.controller.temperatures.query()
         except ConnectionAbortedError:
             pass
-        except ConnectionException:
-            pass
+        except ConnectionException as e:
+            # Handle specific BluZ/Bluetooth errors more gracefully
+            error_msg = str(e).lower()
+            if "operation already in progress" in error_msg or "br-connection-canceled" in error_msg:
+                # These are common Bluetooth stack issues, log at debug level to reduce noise
+                _LOGGER.debug(
+                    "Bluetooth connection issue for sensor %s: %s",
+                    self.name,
+                    str(e),
+                )
+            else:
+                # Other connection exceptions, log at warning level
+                _LOGGER.warning(
+                    "Connection issue for sensor %s: %s",
+                    self.name,
+                    str(e),
+                )
+        except Exception as e:
+            # Catch any other unexpected errors
+            error_msg = str(e).lower()
+            if "operation already in progress" in error_msg or "br-connection-canceled" in error_msg:
+                _LOGGER.debug(
+                    "Bluetooth operation conflict for sensor %s: %s",
+                    self.name,
+                    str(e),
+                )
+            else:
+                _LOGGER.error(
+                    "Unexpected error updating sensor %s: %s",
+                    self.name,
+                    str(e),
+                )
 
     @property
     async def async_device_info(self):

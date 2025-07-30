@@ -316,8 +316,39 @@ class DaikinMadokaClimate(ClimateEntity):
                 + "Connection not available, please reload integration to try reenabling.",
                 self.name,
             )
-        except ConnectionException:
-            pass
+        except ConnectionException as e:
+            # Handle specific BluZ/Bluetooth errors more gracefully
+            error_msg = str(e).lower()
+            if "operation already in progress" in error_msg or "br-connection-canceled" in error_msg:
+                # These are common Bluetooth stack issues, log at debug level to reduce noise
+                _LOGGER.debug(
+                    "Bluetooth connection issue for %s: %s. "
+                    "This is usually temporary and will resolve automatically.",
+                    self.name,
+                    str(e),
+                )
+            else:
+                # Other connection exceptions
+                _LOGGER.warning(
+                    "Connection issue for %s: %s",
+                    self.name,
+                    str(e),
+                )
+        except Exception as e:
+            # Catch any other unexpected errors
+            error_msg = str(e).lower()
+            if "operation already in progress" in error_msg or "br-connection-canceled" in error_msg:
+                _LOGGER.debug(
+                    "Bluetooth operation conflict for %s: %s",
+                    self.name,
+                    str(e),
+                )
+            else:
+                _LOGGER.error(
+                    "Unexpected error updating %s: %s",
+                    self.name,
+                    str(e),
+                )
 
     async def async_turn_on(self):
         """Turn device on."""
